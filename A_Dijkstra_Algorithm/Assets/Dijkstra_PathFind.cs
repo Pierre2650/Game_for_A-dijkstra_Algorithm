@@ -1,8 +1,6 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.Mathematics;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -36,51 +34,86 @@ public class Dijkstra_PathFind : MonoBehaviour
     // on commence par 4 voicin
     private List<Node> unVisited = new List<Node>();
     private List<Node> visited = new List<Node>();
-    private List<Vector2> invertedPath = new List<Vector2>();
-    private float searchColdownElapsed = 0;
-
     private Node currentNode;
+
+    private List<Vector2> invertedPath = new List<Vector2>();
+    private int pathIndex = 0;
+
+    private float searchColdownElapsed = 0;
+    public float searchColdown = 3;
 
     private Vector2 horizontal = new Vector2(0.5f, -0.25f), vertical = new Vector2(0.5f, 0.25f);
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        currentNode = new Node(transform.position, 0);
-        visited.Add(currentNode);
         calculatePath();
-        //StartCoroutine(followPath());
+        pathIndex = invertedPath.Count - 1;
     }
 
     private void Update()
     {
-        /*
-        searchColdownElapsed += Time.deltaTime;
-        if(searchColdownElapsed > 2)
+
+        if (Vector2.Distance(transform.position, target.position) < 0.4f) return;
+
+        // Movement
+        if (invertedPath.Count > 0 && pathIndex < invertedPath.Count)
         {
-            StopAllCoroutines();
+            followPath();
+        }
+
+
+        searchColdownElapsed += Time.deltaTime;
+        if(searchColdownElapsed > searchColdown)
+        {
+
             visited.Clear();
             unVisited.Clear();
             invertedPath.Clear();
 
-            currentNode = new Node(transform.position, 0);
-            visited.Add(currentNode);
             calculatePath();
-            StartCoroutine(followPath());
 
+            pathIndex = invertedPath.Count - 1;
             searchColdownElapsed = 0;
-        }*/
+        }
     }
 
+    private void followPath()
+    {
+
+        if (pathIndex < 0)
+        {
+            visited.Clear();
+            unVisited.Clear();
+            invertedPath.Clear();
+
+            calculatePath();
+
+            pathIndex = invertedPath.Count - 1;
+            searchColdownElapsed = 0;
+        }
+
+        Vector2 nextPos = invertedPath[pathIndex];
+
+        transform.position = Vector2.MoveTowards(transform.position, nextPos, speed * Time.deltaTime);
+
+        if (Vector2.Distance(transform.position, nextPos) < 0.01f)
+        {
+            pathIndex--; // Move to next node
+        }
+    }
     private void calculatePath()
     {
+        currentNode = new Node(transform.position, 0);
+        visited.Add(currentNode);
+
         int temp = 0;
-        while (temp <9999)
+        while (temp <99999)
         {
 
             currentNode = findNextNeightbor(currentNode);
 
-            if (Vector2.Distance(currentNode.position, target.position) < 0.1)
+            if (Vector2.Distance(currentNode.position, target.position) < 0.4)
             {
                 break;
             }
@@ -118,40 +151,17 @@ public class Dijkstra_PathFind : MonoBehaviour
     }
     private Node findNextNeightbor(Node currentNode)
     {
-        List<Vector2> neighbors = new List<Vector2>();
-        // we go clockwise
-        Vector2 up = currentNode.position + vertical;
-        neighbors.Add(up);
-        Vector2 right = currentNode.position + horizontal;
-        neighbors.Add(right);
-        Vector2 down = currentNode.position - vertical;
-        neighbors.Add(down);
-        Vector2 left = currentNode.position - horizontal;
-        neighbors.Add(left);
-
         int newDistance = currentNode.distance + 1;
+        generateNeightbors(newDistance);
 
-        foreach (Vector2 v in neighbors.ToList()) {
-            if (obstacleCheck(v))
-            {
-                continue;
-            }
-
-            if (!unVisited.Exists(x => x.position == v))
-            {
-                unVisited.Add(new Node(v, newDistance, currentNode)); // up vector
-            }
-        }
-
-
-        int min = newDistance;
+        int min = int.MaxValue;
         Node result = null;
         foreach (Node n in unVisited) {
 
             
             if(n.distance < min) 
             {
-                min = newDistance;
+                min = n.distance;
                 result = n;
             }
 
@@ -169,31 +179,90 @@ public class Dijkstra_PathFind : MonoBehaviour
         return result;
     }
 
-    private IEnumerator followPath()
+    private void generateNeightbors(int newDistance)
     {
-        float elapsedT = 0;
+        List<Vector2> straightNeighbors = new List<Vector2>();
+        List<Vector2> diagonalNeighbors = new List<Vector2>();
 
-        int i = invertedPath.Count-1;
+        // we go clockwise
+        Vector2 up = currentNode.position + vertical;
+        straightNeighbors.Add(up);
 
-        while (i>0)
+        Vector2 right = currentNode.position + horizontal;
+        straightNeighbors.Add(right);
+
+        Vector2 down = currentNode.position - vertical;
+        straightNeighbors.Add(down);
+
+        Vector2 left = currentNode.position - horizontal;
+        straightNeighbors.Add(left);
+
+        //-----------Diagonals------------
+        Vector2 upRight = currentNode.position + (vertical + horizontal);
+        diagonalNeighbors.Add(upRight);
+
+        Vector2 downRight = currentNode.position + (-vertical + horizontal);
+        diagonalNeighbors.Add(downRight);
+
+        Vector2 downLeft = currentNode.position + (-vertical - horizontal);
+        diagonalNeighbors.Add(downLeft);
+
+        Vector2 upLeft = currentNode.position + (vertical - horizontal);
+        diagonalNeighbors.Add(upLeft);
+
+
+        foreach (Vector2 v in straightNeighbors.ToList())
         {
-            Vector2 start = transform.position;
-
-            while (elapsedT < 1)
+            if (obstacleCheck(v))
             {
-
-                transform.position = Vector2.Lerp(start, invertedPath[i], elapsedT);
-
-                elapsedT += Time.deltaTime * speed;
-               yield return null;
+                continue;
             }
 
-            transform.position = invertedPath[i];
-            elapsedT = 0;
-            i--;
-            //yield return new WaitForSeconds(Time.deltaTime);
+            Node update = unVisited.Find(x => x.position == v);
+
+            if (update != null)
+            {
+                if (newDistance < update.distance)
+                {
+                    update.distance = newDistance;
+                    update.parent = currentNode;
+                }
+            }
+            else
+            {
+                unVisited.Add(new Node(v, newDistance, currentNode));
+            }
         }
+
+        foreach (Vector2 v in diagonalNeighbors.ToList())
+        {
+            if (obstacleCheck(v))
+            {
+                continue;
+            }
+
+            Node update = unVisited.Find(x => x.position == v);
+
+            if (update != null)
+            {
+                if (newDistance < update.distance)
+                {
+                    update.distance = newDistance;
+                    update.parent = currentNode;
+                }
+
+            }
+            else
+            {
+                unVisited.Add(new Node(v, newDistance + 1, currentNode));
+            }
+        }
+
     }
+
+   
+
+
 
     private void OnDrawGizmos()
     {
@@ -224,12 +293,6 @@ public class Dijkstra_PathFind : MonoBehaviour
             Gizmos.DrawWireSphere(currentNode.position, 0.2f);
         }
 
-
-        if (target != null)
-        {
-            Gizmos.color = Color.black;
-            Gizmos.DrawWireSphere(target.position, 0.2f);
-        }
 
     }
 
