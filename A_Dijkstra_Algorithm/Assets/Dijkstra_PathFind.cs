@@ -49,12 +49,12 @@ public class Dijkstra_PathFind : MonoBehaviour
         currentNode = new Node(transform.position, 0);
         visited.Add(currentNode);
         calculatePath();
-        StartCoroutine(followPath());
+        //StartCoroutine(followPath());
     }
 
     private void Update()
     {
-        
+        /*
         searchColdownElapsed += Time.deltaTime;
         if(searchColdownElapsed > 2)
         {
@@ -69,13 +69,13 @@ public class Dijkstra_PathFind : MonoBehaviour
             StartCoroutine(followPath());
 
             searchColdownElapsed = 0;
-        }
+        }*/
     }
 
     private void calculatePath()
     {
         int temp = 0;
-        while (temp < 9999)
+        while (temp <9999)
         {
 
             currentNode = findNextNeightbor(currentNode);
