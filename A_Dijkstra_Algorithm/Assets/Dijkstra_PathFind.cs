@@ -9,40 +9,22 @@ public class Dijkstra_PathFind : MonoBehaviour
     public Transform target;
     public float speed;
     public LayerMask obstacles;
+    private Vector2 horizontal = new Vector2(0.5f, -0.25f), vertical = new Vector2(0.5f, 0.25f);
 
-    public class Node
-    {
-        
-        public Vector2 position;
-        public Node parent = null;
-        public int distance;
 
-        public Node(Vector2 position, int distance)
-        {
-            this.position = position;
-            this.distance = distance;
-        }
-
-        public Node(Vector2 position, int distance, Node parent)
-        {
-            this.position = position;
-            this.distance = distance;
-            this.parent = parent;
-        }
-    }
-
-    // on commence par 4 voicin
     private List<Node> unVisited = new List<Node>();
     private List<Node> visited = new List<Node>();
     private Node currentNode;
+    private float minDistanceToPlayer = 0.45f;
+
 
     private List<Vector2> invertedPath = new List<Vector2>();
     private int pathIndex = 0;
 
+    
     private float searchColdownElapsed = 0;
     public float searchColdown = 3;
 
-    private Vector2 horizontal = new Vector2(0.5f, -0.25f), vertical = new Vector2(0.5f, 0.25f);
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -54,7 +36,7 @@ public class Dijkstra_PathFind : MonoBehaviour
     private void Update()
     {
 
-        if (Vector2.Distance(transform.position, target.position) < 0.4f) return;
+        if (Vector2.Distance(transform.position, target.position) < minDistanceToPlayer) return;
 
         // Movement
         if (invertedPath.Count > 0 && pathIndex < invertedPath.Count)
@@ -108,12 +90,12 @@ public class Dijkstra_PathFind : MonoBehaviour
         visited.Add(currentNode);
 
         int temp = 0;
-        while (temp <99999)
+        while (temp <9999)
         {
 
             currentNode = findNextNeightbor(currentNode);
 
-            if (Vector2.Distance(currentNode.position, target.position) < 0.4)
+            if (Vector2.Distance(currentNode.position, target.position) < minDistanceToPlayer)
             {
                 break;
             }
@@ -151,10 +133,10 @@ public class Dijkstra_PathFind : MonoBehaviour
     }
     private Node findNextNeightbor(Node currentNode)
     {
-        int newDistance = currentNode.distance + 1;
+        float newDistance = currentNode.distance + 1;
         generateNeightbors(newDistance);
 
-        int min = int.MaxValue;
+        float min = float.PositiveInfinity;
         Node result = null;
         foreach (Node n in unVisited) {
 
@@ -179,12 +161,13 @@ public class Dijkstra_PathFind : MonoBehaviour
         return result;
     }
 
-    private void generateNeightbors(int newDistance)
+    private void generateNeightbors(float newDistance)
     {
         List<Vector2> straightNeighbors = new List<Vector2>();
         List<Vector2> diagonalNeighbors = new List<Vector2>();
 
         // we go clockwise
+        //----------Straight-------------
         Vector2 up = currentNode.position + vertical;
         straightNeighbors.Add(up);
 
@@ -213,7 +196,7 @@ public class Dijkstra_PathFind : MonoBehaviour
 
         foreach (Vector2 v in straightNeighbors.ToList())
         {
-            if (obstacleCheck(v))
+            if (obstacleCheck(v) || visited.Exists(x => x.position == v))
             {
                 continue;
             }
@@ -236,7 +219,7 @@ public class Dijkstra_PathFind : MonoBehaviour
 
         foreach (Vector2 v in diagonalNeighbors.ToList())
         {
-            if (obstacleCheck(v))
+            if (obstacleCheck(v) || visited.Exists(x => x.position == v))
             {
                 continue;
             }
@@ -269,14 +252,14 @@ public class Dijkstra_PathFind : MonoBehaviour
         // Draw a yellow sphere at the transform's position
         foreach (Node n in unVisited) {
             // Draw a yellow sphere at the transform's position
-            Gizmos.color = Color.red;
+            Gizmos.color = Color.magenta;
             Gizmos.DrawWireSphere(n.position, 0.2f);
         }
 
         foreach (Node n in visited)
         {
             // Draw a yellow sphere at the transform's position
-            Gizmos.color = Color.green;
+            Gizmos.color = Color.cyan;
             Gizmos.DrawWireSphere(n.position, 0.2f);
         }
 

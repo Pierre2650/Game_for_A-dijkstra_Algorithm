@@ -24161,6 +24161,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a940161cdb0a4ff43b8fa9c47d8979b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  target: {fileID: 2031105991}
+  speed: 3
+  obstacles:
+    serializedVersion: 2
+    m_Bits: 64
+  searchColdown: 0.5
 --- !u!212 &1133257980
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -24225,7 +24231,7 @@ Transform:
   m_GameObject: {fileID: 1133257978}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.536088, y: -0.8110194, z: 0}
+  m_LocalPosition: {x: -4.055209, y: -0.7306409, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -46499,7 +46505,7 @@ Transform:
   m_GameObject: {fileID: 1681976492}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.0028114, y: 0.13885784, z: 0}
+  m_LocalPosition: {x: -5.714879, y: 0.050421, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -46512,17 +46518,17 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1681976492}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ac8a6a4cec7d46f46b89f4b656b14832, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 2031105991}
-  speed: 4
+  speed: 3
   obstacles:
     serializedVersion: 2
     m_Bits: 64
-  searchColdown: 0.2
+  searchColdown: 0.5
 --- !u!212 &1681976495
 SpriteRenderer:
   m_ObjectHideFlags: 0
