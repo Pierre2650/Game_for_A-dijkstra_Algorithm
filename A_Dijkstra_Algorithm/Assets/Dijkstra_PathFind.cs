@@ -37,7 +37,7 @@ public class Dijkstra_PathFind : MonoBehaviour
     {
         if(Vector2.Distance(transform.position, target.transform.position) > 13f )
         {
-            searchColdown = 1f;
+            searchColdown = 3f;
         }
         else
         {
