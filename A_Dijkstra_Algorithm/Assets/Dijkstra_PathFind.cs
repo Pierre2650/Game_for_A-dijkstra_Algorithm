@@ -15,7 +15,7 @@ public class Dijkstra_PathFind : MonoBehaviour
     private List<Node> unVisited = new List<Node>();
     private List<Node> visited = new List<Node>();
     private Node currentNode;
-    private float minDistanceToPlayer = 0.45f;
+    private float minDistanceToPlayer = 0.55f;
 
 
     private List<Vector2> invertedPath = new List<Vector2>();
@@ -44,7 +44,7 @@ public class Dijkstra_PathFind : MonoBehaviour
             searchColdown = 0.5f;
         }
 
-        Debug.Log("(Vector2.Distance(transform.position, target.transform.position) = " + Vector2.Distance(transform.position, target.transform.position));
+       
 
 
         if (Vector2.Distance(transform.position, target.position) < minDistanceToPlayer) return;

@@ -6,7 +6,7 @@ public class PlayerController : MonoBehaviour
 {
     //private PlayerHealth myHealth;
     private SpriteRenderer mySpr;
-    //private Animator myAni;
+    private Animator myAni;
     private Rigidbody2D myRB;
     
 
@@ -37,7 +37,7 @@ public class PlayerController : MonoBehaviour
       
         mySpr = GetComponent<SpriteRenderer>();
         myRB = GetComponent<Rigidbody2D>();
-        //myAni = GetComponent<Animator>();
+        myAni = GetComponent<Animator>();
 
         startPos = transform.position;
  
@@ -69,11 +69,36 @@ public class PlayerController : MonoBehaviour
         velocity = horizontal * input.x + vertical * input.y;
         //transform.position += (Vector3)(velocity.normalized * speed * Time.deltaTime);
 
+
     }
 
 
     private void setSprite()
     {
+        if(velocity.x < 0f)
+        {
+            transform.eulerAngles = new Vector3(0, 180, 0);
+        }
+        else
+        {
+            transform.eulerAngles = Vector3.zero;
+        }
+
+        if(velocity.y < 0 && velocity.x == 0f)
+        {
+            myAni.SetFloat("VelocityX", Mathf.Abs(velocity.y));
+        }
+        else
+        {
+
+            myAni.SetFloat("VelocityY", velocity.y);
+            myAni.SetFloat("VelocityX", Mathf.Abs(velocity.x));
+
+        }
+
+        
+
+
         /*if (!myHealth.isDead) 
         { 
 
@@ -85,7 +110,7 @@ public class PlayerController : MonoBehaviour
             } 
         }
 
-        myAni.SetFloat("Direction", velocity.x);
+        
 
 
         if (myHealth.isDead && !playDeadAnimation) {
