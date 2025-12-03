@@ -9,6 +9,8 @@ public class Dijkstra_PathFind : MonoBehaviour
     public Transform target;
     public float speed;
     public LayerMask obstacles;
+    private float rayCircleCastRadius =  0.15f;
+    private int nbfailures = 0;
     private Vector2 horizontal = new Vector2(0.5f, -0.25f), vertical = new Vector2(0.5f, 0.25f);
 
 
@@ -104,19 +106,32 @@ public class Dijkstra_PathFind : MonoBehaviour
         while (temp < 9999)
         {
 
-            currentNode = findNextNeightbor(currentNode);
+
+            Node nextNeighbor = findNextNeightbor(currentNode);
+            if (nextNeighbor == null)
+            {
+                nbfailures++;
+                if (nbfailures > 3)
+                {
+                    rayCircleCastRadius = 0.05f;
+                    nbfailures = 0;
+                }
+                break;
+            }
+            else
+            {
+                currentNode = nextNeighbor;
+            }
+
 
             if (Vector2.Distance(currentNode.position, target.position) < minDistanceToPlayer)
             {
+                rayCircleCastRadius = 0.15f;
+                nbfailures = 0;
                 break;
             }
 
             temp++;
-
-        }
-
-        if(temp > 999)
-        {
 
         }
 
@@ -139,7 +154,7 @@ public class Dijkstra_PathFind : MonoBehaviour
     private bool obstacleCheck( Vector2 toTest)
     {
 
-        Collider2D collider = Physics2D.OverlapCircle(toTest, 0.2f, obstacles);
+        Collider2D collider = Physics2D.OverlapCircle(toTest, rayCircleCastRadius, obstacles);
 
         if (collider != null)
         {
@@ -278,6 +293,10 @@ public class Dijkstra_PathFind : MonoBehaviour
         foreach (Node n in visited)
         {
             // Draw a yellow sphere at the transform's position
+            if (n == null)
+            {
+                continue;
+            }
             Gizmos.color = Color.cyan;
             Gizmos.DrawWireSphere(n.position, 0.2f);
         }

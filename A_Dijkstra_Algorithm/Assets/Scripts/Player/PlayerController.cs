@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour
     [Header("Bomb")]
     public GameObject bombprefab;
     private int firePower = 1;
+    public int fireLayer = 0;
 
     [SerializeField] private float attackColdown = 0.3f;
     private Coroutine canATK = null;
@@ -177,6 +178,14 @@ public class PlayerController : MonoBehaviour
 
             Destroy(collision.gameObject);
         }
+
+        if (collision.gameObject.layer == fireLayer)
+        {
+            Destroy(collision.gameObject);
+            // hurt
+        }
+
+
     }
 
 

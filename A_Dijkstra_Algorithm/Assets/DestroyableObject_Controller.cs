@@ -3,9 +3,17 @@ using UnityEngine;
 public class DestroyableObject_Controller : MonoBehaviour
 {
     public int fireLayer = 0;
+    public GameObject fireBonus;
+    private bool hasBonus = false;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        int rand = Random.Range(0, 101);
+
+        if(rand <= 10)
+        {
+            hasBonus = true;
+        }
         
     }
 
@@ -19,13 +27,17 @@ public class DestroyableObject_Controller : MonoBehaviour
    
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log("trigger");
         if (collision.gameObject.layer == fireLayer)
         {
             Destroy(collision.gameObject);
+
+            if(hasBonus)
+            { Instantiate(fireBonus, transform.position, Quaternion.identity, transform.parent); }
             Destroy(gameObject);
         }
     }
+
+    
 
 
 }

@@ -24,11 +24,12 @@ public class Astar : MonoBehaviour
     public Transform target;
     public float speed;
     public LayerMask obstacles;
+    private float rayCircleCastRadius = 0.15f;
+    private int nbfailures = 0;
     private Vector2 horizontal = new Vector2(0.5f, -0.25f), vertical = new Vector2(0.5f, 0.25f);
 
     private List<AstarNode> unVisited = new List<AstarNode>();
     private List<AstarNode> visited = new List<AstarNode>();
-    public Vector2 cNode = Vector2.zero;
     private AstarNode currentNode;
     private float minDistanceToPlayer = 0.45f;
 
@@ -110,10 +111,25 @@ public class Astar : MonoBehaviour
         while (temp < 9999)
         {
 
-            currentNode = findNextNeightbor(currentNode);
+            AstarNode nextNeighbor = findNextNeightbor(currentNode);
+            if (nextNeighbor == null)
+            {
+                nbfailures++;
+                if (nbfailures > 3) {
+                    rayCircleCastRadius = 0.05f;
+                    nbfailures = 0;
+                }
+                break;
+            }
+            else
+            {
+                currentNode = nextNeighbor;
+            }
 
             if (Vector2.Distance(currentNode.position, target.position) < minDistanceToPlayer)
             {
+                rayCircleCastRadius = 0.15f;
+                nbfailures = 0;
                 break;
             }
 
@@ -152,8 +168,6 @@ public class Astar : MonoBehaviour
             }
 
         }
-
-
 
         unVisited.Remove(result);
         visited.Add(result);
@@ -230,6 +244,7 @@ public class Astar : MonoBehaviour
                 continue;
             }
 
+
             AstarNode update = unVisited.Find(x => x.position == v);
 
             if (update != null)
@@ -248,12 +263,16 @@ public class Astar : MonoBehaviour
             }
         }
 
+
+       
+
+
     }
 
     private bool obstacleCheck(Vector2 toTest)
     {
 
-        Collider2D collider = Physics2D.OverlapCircle(toTest, 0.2f, obstacles);
+        Collider2D collider = Physics2D.OverlapCircle(toTest, rayCircleCastRadius, obstacles);
 
         if (collider != null)
         {
@@ -279,7 +298,11 @@ public class Astar : MonoBehaviour
         foreach (AstarNode n in visited)
         {
             // Draw a yellow sphere at the transform's position
-          
+            if(n == null)
+            {
+                continue;
+            }
+
             Gizmos.color = Color.green;
             Gizmos.DrawWireSphere(n.position, 0.2f);
         }

@@ -126,4 +126,4 @@ MonoBehaviour:
   firePrefab: {fileID: 447919481280360701, guid: e80edd45a9da32345ba8bbd8f0f63215, type: 3}
   spawnFire: 0
   flamesLength: 1
-  timetoExplode: 2
+  timetoExplode: 1
